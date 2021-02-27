@@ -2,6 +2,8 @@ export type AllFlights = (string | number)[][]
 
 export type AirplaneImages = string[][]
 
+export type RefetchInterval = number
+
 export interface JetPhotos {
   _id: string
   username: string

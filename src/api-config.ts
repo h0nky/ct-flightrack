@@ -1,0 +1,1 @@
+export const getConfigUrl = (endPoint: string): string => `https://gentle-temple-27938.herokuapp.com/${endPoint}`;
