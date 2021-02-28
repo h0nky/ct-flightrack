@@ -5,7 +5,7 @@ import { AirplaneDetails } from "./components/AirplaneDetails";
 
 export const Router = () => (
     <Fragment>
-        <Route path="/" component={MapComponent} />
-        <Route path="/airplane-details" component={AirplaneDetails} />
+        <Route exact path="/" component={MapComponent} />
+        <Route exact path="/airplane-details/:id" component={AirplaneDetails} />
     </Fragment>
 );

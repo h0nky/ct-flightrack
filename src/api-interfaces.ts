@@ -1,5 +1,7 @@
 export type AllFlights = (string | number)[][]
 
+export type Flight = (string|number)[]
+
 export type AirplaneImages = string[][]
 
 export type RefetchInterval = number

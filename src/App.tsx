@@ -3,9 +3,9 @@ import { Router } from "./Router";
 import { QueryClient, QueryClientProvider } from 'react-query'
 import './App.css';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
-function App() {
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>

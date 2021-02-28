@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useQuery } from 'react-query';
-import { AllFlights, RefetchInterval } from "../api-interfaces";
+import React, { FC, ReactElement } from "react";
 import styled from "styled-components";
 import GoogleMapReact from 'google-map-react';
-import { getConfigUrl } from "../api-config";
 import { AirplaneComponent } from "../components/AirplaneComponent";
+import useFlights from "../hooks/useFlights";
+import { Flight } from "../api-interfaces";
 
 const Container = styled.div`
     display: flex;
@@ -15,36 +13,36 @@ const Container = styled.div`
     height: 100vh;
 `;
 
-export const MapComponent = () => {
-    const [ intervalMs ] = useState<RefetchInterval>(20000)
-    const [ value, setValue ] = useState<AllFlights>([])
-  
-    useQuery(
-      'allFlights',
-      async () => {
-        const res = await axios.get(getConfigUrl('allFlights'));
-        setValue(res.data);
-      },
-      {
-        refetchInterval: intervalMs,
-      }
-    )
-
+export const MapComponent: FC = (): ReactElement => {
+    const { data, isSuccess } = useFlights();
     return (
         <Container>
             <GoogleMapReact
                 yesIWantToUseGoogleMapApiInternals
                 bootstrapURLKeys={{ key: 'AIzaSyCOlDs0H56Q6YH1ZeNwqTU7CT7g-CMGsWY' }}
-                defaultCenter={{ lat: 59.95, lng: 30.33 }}
-                defaultZoom={11}
+                defaultCenter={{ lat: 38.7, lng: -8 }}
+                defaultZoom={5}
             >
-                {value.map((flight: any) => (
-                    <AirplaneComponent
-                        key={flight[1]}
-                        lat={flight[3]}
-                        lng={flight[4]}
-                    />
-                ))}
+                {isSuccess && data.map((flight: Flight) => {
+                    const [
+                        icao24,
+                        callsign,
+                        originCountry,
+                        longtitude,
+                        latitude,
+                        baro_altitude,
+                        velocity,
+                        true_track
+                    ] = flight;
+                    return (
+                        <AirplaneComponent
+                            flightData={flight}
+                            key={icao24}
+                            lat={latitude}
+                            lng={longtitude}
+                        />
+                    );
+                })}
             </GoogleMapReact>
         </Container>
     );
