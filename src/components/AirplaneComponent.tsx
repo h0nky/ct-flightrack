@@ -9,18 +9,21 @@ const ImageWrapper = styled.div`
     height: 30px;
 `;
 
-export const AirplaneComponent: FC<{ lat: number|string, lng: number|string, flightData: Flight }> = ({ flightData }): ReactElement => {
+export const AirplaneComponent: FC<{ lat: number|string, lng: number|string, trueTrack: number|string, icao: number|string, flightData: Flight }> = ({ flightData, trueTrack, icao }): ReactElement => {
     const history = useHistory();
 
     const onHandleClick = () => {
         history.push({
-            pathname: `/airplane-details/${flightData[0]}`,
+            pathname: `/airplane-details/${icao}`,
             state: flightData 
         });
     };
 
     return (
-        <ImageWrapper onClick={onHandleClick}>
+        <ImageWrapper
+            style={{transform: `rotate(${trueTrack}deg)`}}
+            onClick={onHandleClick}
+        >
             <PlaneSVG />
         </ImageWrapper>
     );

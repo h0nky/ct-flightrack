@@ -30,14 +30,16 @@ export const MapComponent: FC = (): ReactElement => {
                         originCountry,
                         longtitude,
                         latitude,
-                        baro_altitude,
+                        baroAltitude,
                         velocity,
-                        true_track
+                        trueTrack
                     ] = flight;
                     return (
                         <AirplaneComponent
                             flightData={flight}
                             key={icao24}
+                            trueTrack={trueTrack}
+                            icao={icao24}
                             lat={latitude}
                             lng={longtitude}
                         />

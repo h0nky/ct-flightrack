@@ -9,7 +9,10 @@ export default function useAirplaneImages(icao: string|number, enabled: boolean)
         },
         {
             enabled: enabled,
-            onSuccess: (): void => console.log('AIRPLANE IMAGES', data)
+            onSuccess: async(): Promise<any> => {
+                const response = await axios.post(getConfigUrl('jetPhotos'), data);
+                return response.data;
+            }
         }
     );
 }
