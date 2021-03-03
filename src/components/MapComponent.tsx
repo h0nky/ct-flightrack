@@ -23,7 +23,7 @@ export const MapComponent: FC = (): ReactElement => {
                 defaultCenter={{ lat: 38.7, lng: -8 }}
                 defaultZoom={5}
             >
-                {isSuccess && data.map((flight: Flight) => {
+                {isSuccess && data?.map((flight: Flight) => {
                     const [
                         icao24,
                         callsign,

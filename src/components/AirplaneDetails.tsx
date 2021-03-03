@@ -1,9 +1,11 @@
-import { useLocation } from "react-router";
+import React, { FC, ReactElement, useEffect, useState } from "react";
+import { useLocation, useHistory } from "react-router";
 import useJetPhotos from "../hooks/useJetPhotos";
 import useAirplaneImages from "../hooks/useAirplaneImages";
 import styled from "styled-components";
 import { Flight, JetPhotos } from "../api-interfaces";
 import useAddNewPhoto from "../hooks/useAddNewPhoto";
+import useRemoveImage from "../hooks/useRemoveImage";
 
 const Container = styled.div`
     display: flex;
@@ -19,57 +21,109 @@ const Card = styled.div`
     width: 400px;
     height: 600px;
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.05), 0px 14px 20px rgba(0, 0, 0, 0.2);
-    background-color: #ffffff;
+    background-color: white;
     display: flex;
     flex-direction: column;
 `;
 
-const Title = styled.h2`
+const Title = styled.p`
     color: #080E14;
+    font-weight: 600;
+    font-size: 18px;
 `;
 
-const Image = styled.img``;
+const Image = styled.img`
+    height: 264px;
+`;
 
-const CardBody = styled.div`
+const CardHeader = styled.div`
     display: flex;
     justify-content: space-between;
     padding: 0 32px;
 `;
 
-export const AirplaneDetails = () => {
+const CardBody = styled.div`
+    display: flex;
+    justify-content: space-between;
+    padding: 32px;
+`;
+
+const Button = styled.button`
+    padding: 4px;
+    color: #080E14;
+    width: 50%;
+    margin: 0 auto;
+`;
+
+const BackButton = styled.span`
+    color: #080E14;
+    font-weight: 600;
+    font-size: 18px;
+    align-self: center;
+    cursor: pointer;
+`;
+
+export const AirplaneDetails: FC = (): ReactElement => {
+    const history = useHistory();
+    const [ mainImage, setMainImage ] = useState<JetPhotos>();
     const { state: [ icao24, callsign, originCountry, baro_altitude, velocity ] } = useLocation<Flight>();
-    const { data, isLoading } = useJetPhotos();
+    const { data: jetPhotos } = useJetPhotos();
 
-    const isImageRequired = () => {
-        if (isLoading) return false
-        const result = data.find((item: JetPhotos) => item.airplane_icao === icao24);
+    const isImageRequired = (): boolean => {
+        const result = jetPhotos?.find((item: JetPhotos) => item.airplane_icao === icao24);
         return !result
-    }
-
-    const getImage = () => {
-        const result = data?.find((item: JetPhotos) => item.airplane_icao === icao24);
-        if (result) return <Image src={result.airplane_image} />
-        return <Image src='https://via.placeholder.com/150' />
     }
 
     const { data: airplaneImage } = useAirplaneImages(icao24, isImageRequired());
 
-    const mutation = useAddNewPhoto({ username: 'jenya golovnov', airplane_icao: icao24, airplane_image: airplaneImage });
+    useEffect(() => {
+        const result = jetPhotos?.find((item: JetPhotos) => item.airplane_icao === icao24);
+        if (result) setMainImage(result);
+    }, [icao24, jetPhotos]);
 
-    if (mutation.isIdle) mutation.mutate();
+    const mutationUpdate: any = useAddNewPhoto({
+        username: 'jenya golovnov',
+        airplane_icao: icao24,
+        airplane_image: airplaneImage
+    });
+
+    if (mutationUpdate.isIdle) mutationUpdate.mutate({
+        username: 'jenya golovnov',
+        airplane_icao: icao24,
+        airplane_image: airplaneImage
+    });
+
+    const mutationRemove = useRemoveImage(mainImage?._id);
+
+    const onHandleClick = (): void => {
+        history.goBack();
+    }
 
     return (
         <Container>
             <Card>
+                <CardHeader>
+                    <BackButton onClick={onHandleClick}>{'<'}</BackButton>
+                    <Title>{originCountry}</Title>
+                </CardHeader>
+                <Image
+                    alt="A plane image"
+                    src={
+                        mainImage?.airplane_image ?
+                        mainImage?.airplane_image :
+                        'https://via.placeholder.com/150'
+                    }
+                />
                 <CardBody>
                     <Title>{callsign}</Title>
-                    <Title>{originCountry}</Title>
-                </CardBody>
-                {getImage()}
-                <CardBody>
                     <Title>{baro_altitude}</Title>
                     <Title>{velocity}</Title>
                 </CardBody>
+                <Button disabled={!mainImage?.airplane_image} onClick={() => {
+                    mutationRemove.mutate()
+                }}>
+                    Delete Image
+                </Button>
             </Card>
         </Container>
     );

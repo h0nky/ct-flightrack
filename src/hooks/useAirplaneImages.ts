@@ -16,6 +16,7 @@ export default function useAirplaneImages(icao: string|number, enabled: boolean)
         },
         {
             enabled: enabled,
+            refetchOnWindowFocus: false
         }
     );
 }

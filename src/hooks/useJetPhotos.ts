@@ -11,6 +11,9 @@ export default function useJetPhotos() {
             } catch (e) {
                 console.error(e);
             }
+        },
+        {
+            refetchOnWindowFocus: false,
         }
     );
 }
