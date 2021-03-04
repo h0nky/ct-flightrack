@@ -87,11 +87,15 @@ export const AirplaneDetails: FC = (): ReactElement => {
         airplane_image: airplaneImage
     });
 
-    if (mutationUpdate.isIdle) mutationUpdate.mutate({
-        username: 'jenya golovnov',
-        airplane_icao: icao24,
-        airplane_image: airplaneImage
-    });
+    useEffect(() => {
+        if(airplaneImage) {
+            mutationUpdate.mutate({
+                username: 'jenya golovnov',
+                airplane_icao: icao24,
+                airplane_image: airplaneImage
+            });
+        }
+    }, [airplaneImage, icao24]);
 
     const mutationRemove = useRemoveImage(mainImage?._id);
 
