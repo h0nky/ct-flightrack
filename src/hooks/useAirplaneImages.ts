@@ -3,7 +3,7 @@ import axios from "axios";
 import { getConfigUrl } from "../api-config";
 
 export default function useAirplaneImages(icao: string|number, enabled: boolean) {
-    return useQuery('airplaneImages', async () => {
+    return useQuery(['airplaneImages', {icao}], async () => {
             try {
                 const response = await axios.get(getConfigUrl(`airplaneImages/${icao}`));
                 if (response.data) {

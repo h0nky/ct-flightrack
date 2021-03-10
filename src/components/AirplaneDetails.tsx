@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useEffect, useState } from "react";
+import React, { FC, ReactElement, useEffect, useState, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
 import useJetPhotos from "../hooks/useJetPhotos";
 import useAirplaneImages from "../hooks/useAirplaneImages";
@@ -65,9 +65,13 @@ const BackButton = styled.span`
 
 export const AirplaneDetails: FC = (): ReactElement => {
     const history = useHistory();
-    const [ mainImage, setMainImage ] = useState<JetPhotos>();
     const { state: [ icao24, callsign, originCountry, baro_altitude, velocity ] } = useLocation<Flight>();
-    const { data: jetPhotos } = useJetPhotos();
+    const { data: jetPhotos, status } = useJetPhotos();
+
+    const avatar = useMemo(() => {
+        const result = jetPhotos?.find((item: JetPhotos) => item.airplane_icao === icao24);
+        return result;
+    }, [icao24, jetPhotos]);
 
     const isImageRequired = (): boolean => {
         const result = jetPhotos?.find((item: JetPhotos) => item.airplane_icao === icao24);
@@ -76,12 +80,7 @@ export const AirplaneDetails: FC = (): ReactElement => {
 
     const { data: airplaneImage } = useAirplaneImages(icao24, isImageRequired());
 
-    useEffect(() => {
-        const result = jetPhotos?.find((item: JetPhotos) => item.airplane_icao === icao24);
-        if (result) setMainImage(result);
-    }, [icao24, jetPhotos]);
-
-    const mutationUpdate: any = useAddNewPhoto({
+    const mutationUpdate = useAddNewPhoto({
         username: 'jenya golovnov',
         airplane_icao: icao24,
         airplane_image: airplaneImage
@@ -97,7 +96,7 @@ export const AirplaneDetails: FC = (): ReactElement => {
         }
     }, [airplaneImage, icao24]);
 
-    const mutationRemove = useRemoveImage(mainImage?._id);
+    const mutationRemove = useRemoveImage(avatar._id);
 
     const onHandleClick = (): void => {
         history.goBack();
@@ -105,30 +104,31 @@ export const AirplaneDetails: FC = (): ReactElement => {
 
     return (
         <Container>
-            <Card>
-                <CardHeader>
-                    <BackButton onClick={onHandleClick}>{'<'}</BackButton>
-                    <Title>{originCountry}</Title>
-                </CardHeader>
-                <Image
-                    alt="A plane image"
-                    src={
-                        mainImage?.airplane_image ?
-                        mainImage?.airplane_image :
-                        'https://via.placeholder.com/150'
-                    }
-                />
-                <CardBody>
-                    <Title>{callsign}</Title>
-                    <Title>{baro_altitude}</Title>
-                    <Title>{velocity}</Title>
-                </CardBody>
-                <Button disabled={!mainImage?.airplane_image} onClick={() => {
-                    mutationRemove.mutate()
-                }}>
-                    Delete Image
-                </Button>
-            </Card>
+            {status === "loading" ? <div>{'Loading...'}</div> : (
+                <Card>
+                    <CardHeader>
+                        <BackButton onClick={onHandleClick}>{'<'}</BackButton>
+                        <Title>{originCountry}</Title>
+                    </CardHeader>
+                    <Image
+                        alt="A plane image"
+                        src={
+                            avatar?.airplane_image ?
+                            avatar?.airplane_image :
+                            'https://via.placeholder.com/150'
+                        }
+                    />
+                    <CardBody>
+                        <Title>{callsign}</Title>
+                        <Title>{baro_altitude}</Title>
+                        <Title>{velocity}</Title>
+                    </CardBody>
+                    <Button disabled={!mainImage?.airplane_image} onClick={() => {
+                        mutationRemove.mutate()
+                    }}>
+                        Delete Image
+                    </Button>
+                </Card>)}
         </Container>
     );
 }

@@ -4,16 +4,13 @@ import { getConfigUrl } from "../api-config";
 
 export default function useFlights() {
     return useQuery('allFlights', async () => {
-            try {
-                const response = await axios.get(getConfigUrl('allFlights'));
-                return response.data;
-            } catch (e) {
-                console.error(e);
-            }
+            const response = await axios.get(getConfigUrl('allFlights'));
+            return response.data;
         },
         {
             refetchOnWindowFocus: false,
             refetchInterval: 20000,
+            onError: (e) => console.error(e)
         }
     );
 }

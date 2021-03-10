@@ -1,6 +1,6 @@
-export type AllFlights = (string | number)[][]
-
 export type Flight = (string|number)[]
+
+export type AllFlights = Flight[]
 
 export type AirplaneImages = string[][]
 
